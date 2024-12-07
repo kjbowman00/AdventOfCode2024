@@ -1,5 +1,5 @@
 package day7;
 
 public enum Operator {
-    ADD, MULTIPLY
+    ADD, MULTIPLY, CONCAT
 }

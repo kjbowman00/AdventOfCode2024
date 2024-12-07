@@ -2,6 +2,8 @@ package day7;
 
 import api.DayResult;
 
+import java.math.BigInteger;
+
 public class Day7 {
     public DayResult run(String input) {
         input = input.replace("\r", "");
@@ -14,19 +16,20 @@ public class Day7 {
         }
 
 
-        long calibrationTotal = 0;
+        BigInteger calibrationTotal = new BigInteger("0");
         for (Equation equation : equations) {
             ValueHolder value = new ValueHolder(equation.operands[0]);
 
             if (check(0, equation, new ValueHolder(equation.operands[0]), Operator.ADD) ||
-                    check(0, equation, new ValueHolder(equation.operands[0]), Operator.MULTIPLY)) {
+                    check(0, equation, new ValueHolder(equation.operands[0]), Operator.MULTIPLY) ||
+                    check(0, equation, new ValueHolder(equation.operands[0]), Operator.CONCAT)) {
 
-                calibrationTotal += equation.total;
+                calibrationTotal = calibrationTotal.add(equation.total);
             }
         }
 
 
-        long finalCalibrationTotal = calibrationTotal;
+        BigInteger finalCalibrationTotal = calibrationTotal;
         return new DayResult() {
             @Override
             public void printResult() {
@@ -36,12 +39,16 @@ public class Day7 {
     }
 
     private boolean check(int i, Equation equation, ValueHolder value, Operator operator) {
-        if (i + 1 >= equation.operands.length) return value.value == equation.total;
+        if (i + 1 >= equation.operands.length) return value.value.equals(equation.total);
 
         if (operator == Operator.ADD) {
-            value.value = value.value + equation.operands[i + 1];
+            value.value = value.value.add(equation.operands[i + 1]);
         } else if (operator == Operator.MULTIPLY) {
-            value.value = value.value * equation.operands[i + 1];
+            value.value = value.value.multiply(equation.operands[i + 1]);
+        } else if (operator == Operator.CONCAT) {
+            String valueString = String.valueOf(value.value);
+            String nextString = String.valueOf(equation.operands[i+1]);
+            value.value = new BigInteger(valueString + nextString);
         }
 
         ValueHolder addHolder = new ValueHolder(value.value);
@@ -54,7 +61,14 @@ public class Day7 {
         ValueHolder multiplyHolder = new ValueHolder(value.value);
         boolean multiplyWorks = check(i + 1, equation, multiplyHolder, Operator.MULTIPLY);
         if (multiplyWorks) {
-            value.value = addHolder.value;
+            value.value = multiplyHolder.value;
+            return true;
+        }
+
+        ValueHolder concatHolder = new ValueHolder(value.value);
+        boolean concatWorks = check(i + 1, equation, concatHolder, Operator.CONCAT);
+        if (concatWorks) {
+            value.value = concatHolder.value;
             return true;
         }
 
@@ -62,8 +76,8 @@ public class Day7 {
     }
 
     private class ValueHolder {
-        long value;
-        public ValueHolder(long value) {
+        BigInteger value;
+        public ValueHolder(BigInteger value) {
             this.value = value;
         }
     }
