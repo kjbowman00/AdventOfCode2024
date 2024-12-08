@@ -56,8 +56,9 @@ public class Day8 {
                 for (int j = 0; j < positions.size(); j++) {
                     Vector2 position2 = positions.get(j);
                     if (j != i) {
-                        Vector2 antinodePos = getAntinodePosition(position, position2);
-                        if (! outOfBounds(antinodePos.x, antinodePos.y, gridWidth, gridHeight)) {
+                        List<Vector2> antinodePositions = getAntinodePositions(position, position2, gridWidth, gridHeight);
+
+                        for (Vector2 antinodePos : antinodePositions) {
                             if (antinodes.get(antinodePos.x).get(antinodePos.y).isEmpty()) {
                                 uniqueAntinodeCount++;
                             }
@@ -84,9 +85,34 @@ public class Day8 {
     }
 
 
-    private Vector2 getAntinodePosition(Vector2 p1, Vector2 p2) {
-        int x = p2.x + 2*(p1.x - p2.x);
-        int y = p2.y + 2*(p1.y - p2.y);
-        return new Vector2(x,y);
+    private List<Vector2> getAntinodePositions(Vector2 p1, Vector2 p2, int gridWidth, int gridHeight) {
+        Vector2 diffVector = new Vector2(p1.x -p2.x, p1.y - p2.y);
+        diffVector = lowestFactored(diffVector);
+
+        ArrayList<Vector2> antinodes = new ArrayList<>();
+        Vector2 antinodePos = new Vector2(p2.x + diffVector.x, p2.y + diffVector.y);
+        int multiple = 1;
+        while (! outOfBounds(antinodePos.x, antinodePos.y, gridWidth, gridHeight)) {
+            antinodes.add(antinodePos);
+
+            multiple++;
+            antinodePos = new Vector2(p2.x + diffVector.x * multiple, p2.y + diffVector.y * multiple);
+        }
+
+        return antinodes;
+    }
+
+    private Vector2 lowestFactored(Vector2 v) {
+        int gcd = gcd(v.x, v.y);
+        return new Vector2(v.x / gcd, v.y / gcd);
+    }
+
+    private int gcd(int a, int b)
+    {
+        a = Math.abs(a);
+        b = Math.abs(b);
+        if (a == 0)
+            return b;
+        return gcd(b % a, a);
     }
 }
