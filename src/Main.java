@@ -1,4 +1,5 @@
 import api.DayResult;
+import day11.Day11;
 import day6.Day6;
 import day7.Day7;
 import day8.Day8;
@@ -10,8 +11,8 @@ import java.nio.file.Paths;
 public class Main {
     public static void main(String[] args) throws IOException {
         // Select the input and day
-        Day8 day = new Day8();
-        String inputFilePath = "data/day8/day8.txt";
+        Day11 day = new Day11();
+        String inputFilePath = "data/day11/day11.txt";
 
         // Read the input
         String inputString = Files.readString(Paths.get(inputFilePath));
